@@ -1,26 +1,31 @@
-import { Stack } from 'expo-router';
-import * as SplashScreen from 'expo-splash-screen';
-import { StatusBar } from 'expo-status-bar';
-import { useEffect } from 'react';
-import { AuthProvider, useAuth } from '@/lib/auth';
+import { AuthProvider, useAuth } from "@/lib/auth";
+import { Stack } from "expo-router";
+import * as SplashScreen from "expo-splash-screen";
+import { StatusBar } from "expo-status-bar";
+import { useEffect } from "react";
 
-// Keep the splash screen up until we know whether a saved session exists.
 SplashScreen.preventAutoHideAsync();
 
 function RootNavigator() {
   const { user, loading } = useAuth();
 
   useEffect(() => {
-    if (!loading) SplashScreen.hideAsync();
+    if (!loading) {
+      SplashScreen.hideAsync();
+    }
   }, [loading]);
+
+  if (loading) {
+    return null;
+  }
 
   return (
     <Stack screenOptions={{ headerShown: false }}>
-      {/* Signed in: only (app) is reachable. Signed out: only (auth). Switching is automatic. */}
-      <Stack.Protected guard={!!user}>
+      <Stack.Protected guard={!!user} redirectTo="/(auth)/login">
         <Stack.Screen name="(app)" />
       </Stack.Protected>
-      <Stack.Protected guard={!user}>
+
+      <Stack.Protected guard={!user} redirectTo="/(app)">
         <Stack.Screen name="(auth)" />
       </Stack.Protected>
     </Stack>

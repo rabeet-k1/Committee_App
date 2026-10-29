@@ -1,8 +1,16 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
-import { api, setSessionExpiredHandler } from './api';
-import { normalizePhone } from './format';
-import { tokenStorage } from './storage';
-import type { AuthResponse, User } from './types';
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from "react";
+import { api, setSessionExpiredHandler } from "./api";
+import { normalizePhone } from "./format";
+import { tokenStorage } from "./storage";
+import type { AuthResponse, User } from "./types";
 
 interface RegisterInput {
   name: string;
@@ -40,7 +48,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     (async () => {
       try {
         if (await tokenStorage.getAccess()) {
-          setUser(await api<User>('/users/me'));
+          setUser(await api<User>("/users/me"));
         }
       } catch {
         // invalid/expired session (or server unreachable): start at the login screen
@@ -60,8 +68,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = useCallback(
     async (phone: string, password: string) => {
-      const data = await api<AuthResponse>('/auth/login', {
-        method: 'POST',
+      const data = await api<AuthResponse>("/auth/login", {
+        method: "POST",
         body: { phone: normalizePhone(phone), password },
         auth: false,
       });
@@ -72,8 +80,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const register = useCallback(
     async (input: RegisterInput) => {
-      const data = await api<AuthResponse>('/auth/register', {
-        method: 'POST',
+      const data = await api<AuthResponse>("/auth/register", {
+        method: "POST",
         body: {
           name: input.name.trim(),
           phone: normalizePhone(input.phone),
@@ -88,12 +96,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     [startSession],
   );
 
-  const value = useMemo(() => ({ user, loading, login, register, logout }), [user, loading, login, register, logout]);
+  const value = useMemo(
+    () => ({ user, loading, login, register, logout }),
+    [user, loading, login, register, logout],
+  );
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
 export function useAuth() {
   const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error('useAuth must be used inside <AuthProvider>');
+  if (!ctx) throw new Error("useAuth must be used inside <AuthProvider>");
   return ctx;
 }

@@ -1,12 +1,19 @@
-import { Stack, router, useFocusEffect } from 'expo-router';
-import { useCallback, useState } from 'react';
-import { ActivityIndicator, FlatList, Pressable, RefreshControl, Text, View } from 'react-native';
-import { api, errorMessage } from '@/lib/api';
-import { useAuth } from '@/lib/auth';
-import { formatPkr, frequencyLabel } from '@/lib/format';
-import type { CommitteeListItem } from '@/lib/types';
-import { Button, Card, ErrorText, Muted, StatusBadge } from '@/ui/kit';
-import { useTheme } from '@/ui/theme';
+import { api, errorMessage } from "@/lib/api";
+import { useAuth } from "@/lib/auth";
+import { formatPkr, frequencyLabel } from "@/lib/format";
+import type { CommitteeListItem } from "@/lib/types";
+import { Button, Card, ErrorText, Muted, StatusBadge } from "@/ui/kit";
+import { useTheme } from "@/ui/theme";
+import { Stack, router, useFocusEffect } from "expo-router";
+import { useCallback, useState } from "react";
+import {
+  ActivityIndicator,
+  FlatList,
+  Pressable,
+  RefreshControl,
+  Text,
+  View,
+} from "react-native";
 
 export default function CommitteesScreen() {
   const { user, logout } = useAuth();
@@ -17,7 +24,7 @@ export default function CommitteesScreen() {
 
   const load = useCallback(async () => {
     try {
-      setItems(await api<CommitteeListItem[]>('/committees'));
+      setItems(await api<CommitteeListItem[]>("/committees"));
       setError(null);
     } catch (e) {
       setError(errorMessage(e));
@@ -43,7 +50,9 @@ export default function CommitteesScreen() {
         options={{
           headerRight: () => (
             <Pressable onPress={() => void logout()} hitSlop={10}>
-              <Text style={{ color: t.brand, fontWeight: '600' }}>Sign out</Text>
+              <Text style={{ color: t.brand, fontWeight: "600" }}>
+                Sign out
+              </Text>
             </Pressable>
           ),
         }}
@@ -53,12 +62,23 @@ export default function CommitteesScreen() {
         data={items ?? []}
         keyExtractor={(c) => c.id}
         contentContainerStyle={{ padding: 20, gap: 12, flexGrow: 1 }}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
         ListHeaderComponent={
           <View style={{ gap: 12, marginBottom: 4 }}>
-            <Text style={{ color: t.text, fontSize: 22, fontWeight: '700' }}>Hi, {user?.name.split(' ')[0]}</Text>
-            <Button title="Create a committee" onPress={() => router.push('/create')} />
-            <Button title="Join with invite code" variant="outline" onPress={() => router.push('/join')} />
+            <Text style={{ color: t.text, fontSize: 22, fontWeight: "700" }}>
+              Hi, {user?.name}
+            </Text>
+            <Button
+              title="Create a committee"
+              onPress={() => router.push("/create")}
+            />
+            <Button
+              title="Join with invite code"
+              variant="outline"
+              onPress={() => router.push("/join")}
+            />
             <ErrorText>{error}</ErrorText>
           </View>
         }
@@ -66,20 +86,46 @@ export default function CommitteesScreen() {
           items === null && !error ? (
             <ActivityIndicator style={{ marginTop: 32 }} />
           ) : items ? (
-            <View style={{ marginTop: 32, alignItems: 'center' }}>
-              <Muted>You are not in any committee yet. Create one or join with a code.</Muted>
+            <View style={{ marginTop: 32, alignItems: "center" }}>
+              <Muted>
+                You are not in any committee yet. Create one or join with a
+                code.
+              </Muted>
             </View>
-          ) : null
+          ) : undefined
         }
         renderItem={({ item }) => (
-          <Pressable onPress={() => router.push({ pathname: '/committee/[id]', params: { id: item.id } })}>
+          <Pressable
+            onPress={() =>
+              router.push({
+                pathname: "/committee/[id]",
+                params: { id: item.id },
+              })
+            }
+          >
             <Card>
-              <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Text style={{ color: t.text, fontSize: 17, fontWeight: '700', flexShrink: 1 }}>{item.name}</Text>
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                }}
+              >
+                <Text
+                  style={{
+                    color: t.text,
+                    fontSize: 17,
+                    fontWeight: "700",
+                    flexShrink: 1,
+                  }}
+                >
+                  {item.name}
+                </Text>
                 <StatusBadge status={item.status} />
               </View>
               <Muted>
-                {formatPkr(item.contributionPkr)} {frequencyLabel(item.frequency)}
+                {formatPkr(item.contributionPkr)}{" "}
+                {frequencyLabel(item.frequency)}
               </Muted>
               <Muted>
                 {item._count.members} of {item.totalMembers} members
